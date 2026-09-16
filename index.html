@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>琳碎日常</title>
+    <meta name="theme-color" content="#829986" />
+    <meta name="description" content="琳碎日常：记录想法、日记与小路乱拍。" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="icon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#"><span>✦</span> 琳碎日常</a>
+        <button class="new-entry" id="newEntryBtn">＋ <span>写一篇</span></button>
+        <nav>
+          <button class="nav-item active" data-view="today"><span>⌂</span> 今天</button>
+          <button class="nav-item" data-view="timeline"><span>◷</span> 时光轴</button>
+          <button class="nav-item" data-view="photos"><span>▧</span> 小路乱拍</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <p>把日子，写成诗。</p>
+          <button class="theme-toggle" id="themeToggle">☾ 夜间模式</button>
+        </div>
+      </aside>
+
+      <section class="content">
+        <header class="topbar">
+          <button class="menu-button" id="menuButton" aria-label="打开菜单">☰</button>
+          <div>
+            <p class="eyebrow" id="weekday">FRIDAY</p>
+            <h1 id="pageTitle">今天，想记下什么？</h1>
+          </div>
+          <button class="calendar-button" id="calendarButton" title="选择日期">▣</button>
+          <input id="datePicker" type="date" aria-label="选择日期" />
+        </header>
+
+        <div id="todayView" class="view">
+          <section class="journal-card">
+            <div class="journal-meta"><span id="todayDate"></span><span id="wordCount">0 字</span></div>
+            <input class="title-input" id="entryTitle" placeholder="给这一刻一个标题…" maxlength="80" />
+            <textarea id="entryBody" placeholder="写下此刻的心情、灵感和琐碎的小事…"></textarea>
+            <div class="image-preview-grid" id="imagePreview"></div>
+            <div class="composer-footer">
+              <label class="image-upload" title="添加图片"><input id="imageInput" type="file" accept="image/*" multiple /> ◫ <span>添加图片</span></label>
+              <div class="moods" id="moods" aria-label="选择心情">
+                <button data-mood="☀️" class="selected">☀️</button><button data-mood="🌿">🌿</button><button data-mood="✨">✨</button><button data-mood="☁️">☁️</button><button data-mood="🌙">🌙</button>
+              </div>
+              <button class="save-button" id="saveButton">保存日记 <span>→</span></button>
+            </div>
+          </section>
+
+          <section class="recent-section">
+            <div class="section-heading"><h2>最近的片段</h2><button data-view="timeline">查看全部 →</button></div>
+            <div class="entry-list" id="recentEntries"></div>
+          </section>
+        </div>
+
+        <div id="timelineView" class="view hidden">
+          <section class="timeline-header"><h2>时光轴</h2><p>每一个被认真记下的日子，都闪着光。</p></section>
+          <div class="timeline-list" id="timelineEntries"></div>
+        </div>
+
+        <div id="photosView" class="view hidden">
+          <section class="timeline-header"><h2>小路乱拍</h2><p>路过的风景与被珍藏的瞬间。</p></section>
+          <div class="gallery" id="gallery"></div>
+        </div>
+      </section>
+    </main>
+    <div class="toast" id="toast">已保存到你的日记本</div>
+    <script src="app.js"></script>
+  </body>
+</html>

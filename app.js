@@ -1,0 +1,26 @@
+const storeKey = 'glow-journal-entries-v1';
+let entries = JSON.parse(localStorage.getItem(storeKey) || '[]');
+let pendingImages = [], selectedMood = '☀️', currentDate = new Date();
+const $ = (s) => document.querySelector(s);
+const dateText = (date) => new Intl.DateTimeFormat('zh-CN',{year:'numeric',month:'long',day:'numeric'}).format(date);
+const dateKey = (date) => new Date(date).toISOString().slice(0,10);
+function updateDate() { $('#todayDate').textContent = dateText(currentDate); $('#weekday').textContent = new Intl.DateTimeFormat('en-US',{weekday:'long'}).format(currentDate).toUpperCase(); }
+function saveAll() { localStorage.setItem(storeKey, JSON.stringify(entries)); }
+function esc(s='') { const d=document.createElement('div');d.textContent=s;return d.innerHTML; }
+function card(entry, timeline=false) { const image=entry.images?.[0]; return `<article class="entry-card"><div class="entry-mood">${entry.mood}</div><div class="entry-content"><h3>${esc(entry.title || '无题片段')}</h3><p>${esc(entry.body || '记录了一段安静的时光。')}</p></div>${image ? `<img class="entry-thumb" src="${image}" alt="日记图片">` : ''}<time class="entry-date">${timeline ? '' : dateText(entry.date)}</time>${timeline ? `<button class="delete-entry" data-id="${entry.id}">删除</button>` : ''}</article>`; }
+function render() { const sorted=[...entries].sort((a,b)=>new Date(b.date)-new Date(a.date)); const recent=sorted.slice(0,3); $('#recentEntries').innerHTML=recent.length?recent.map(e=>card(e)).join(''):'<div class="empty">还没有日记。今天的第一笔，从这里开始。</div>'; $('#timelineEntries').innerHTML=sorted.length?sorted.map(e=>`<div class="timeline-item"><div class="timeline-date">${dateText(e.date)}</div>${card(e,true)}</div>`).join(''):'<div class="empty">时光轴还在等待你的故事。</div>'; const pics=sorted.flatMap(e=>(e.images||[]).map(src=>({src,date:e.date}))); $('#gallery').innerHTML=pics.length?pics.map(p=>`<div class="gallery-item"><img src="${p.src}" alt="日记照片"><span>${dateText(p.date)}</span></div>`).join(''):'<div class="empty">上传图片后，它们会出现在这里。</div>'; }
+function renderPreviews() { $('#imagePreview').innerHTML=pendingImages.map((src,i)=>`<div class="preview"><img src="${src}" alt="待上传图片"><button class="remove-image" data-index="${i}">×</button></div>`).join(''); }
+function showView(name) { document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden')); $(`#${name}View`).classList.remove('hidden'); document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.view===name)); $('#pageTitle').textContent=name==='today'?'今天，想记下什么？':name==='timeline'?'回看走过的路':'小路乱拍'; $('.sidebar').classList.remove('open'); }
+$('#entryBody').addEventListener('input', e=>$('#wordCount').textContent=`${e.target.value.trim().length} 字`);
+$('#imageInput').addEventListener('change', async e=> { const files=[...e.target.files].slice(0,6-pendingImages.length); for(const file of files) { if(file.size>2*1024*1024) { alert('单张图片请控制在 2MB 以内'); continue; } pendingImages.push(await new Promise(r=>{const reader=new FileReader();reader.onload=()=>r(reader.result);reader.readAsDataURL(file);})); } e.target.value=''; renderPreviews(); });
+$('#imagePreview').addEventListener('click',e=>{const i=e.target.dataset.index;if(i!==undefined){pendingImages.splice(i,1);renderPreviews();}});
+$('#moods').addEventListener('click',e=>{if(!e.target.dataset.mood)return;selectedMood=e.target.dataset.mood;document.querySelectorAll('.moods button').forEach(b=>b.classList.toggle('selected',b.dataset.mood===selectedMood));});
+$('#saveButton').addEventListener('click',()=>{const title=$('#entryTitle').value.trim(),body=$('#entryBody').value.trim();if(!title&&!body&&!pendingImages.length){$('#entryBody').focus();return;} entries.unshift({id:crypto.randomUUID(),date:dateKey(currentDate),title,body,mood:selectedMood,images:pendingImages});saveAll();$('#entryTitle').value='';$('#entryBody').value='';$('#wordCount').textContent='0 字';pendingImages=[];renderPreviews();render();const t=$('#toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);});
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+$('#timelineEntries').addEventListener('click',e=>{const id=e.target.dataset.id;if(id){entries=entries.filter(x=>x.id!==id);saveAll();render();}});
+$('#calendarButton').addEventListener('click',()=>$('#datePicker').showPicker());$('#datePicker').addEventListener('change',e=>{currentDate=new Date(`${e.target.value}T12:00:00`);updateDate();});$('#newEntryBtn').addEventListener('click',()=>{showView('today');$('#entryTitle').focus();});$('#menuButton').addEventListener('click',()=>$('.sidebar').classList.toggle('open'));$('#themeToggle').addEventListener('click',()=>{document.body.classList.toggle('night');$('#themeToggle').textContent=document.body.classList.contains('night')?'☀ 日间模式':'☾ 夜间模式';});
+updateDate(); render();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+}

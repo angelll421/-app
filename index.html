@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>琳碎日常</title>
-    <meta name="theme-color" content="#829986" />
+    <meta name="theme-color" content="#4da9e8" />
     <meta name="description" content="琳碎日常：记录想法、日记与小路乱拍。" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="apple-touch-icon" href="icon.svg" />
@@ -73,6 +73,16 @@
       </section>
     </main>
     <div class="toast" id="toast">已保存到你的日记本</div>
+    <div class="detail-modal hidden" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <div class="modal-backdrop" data-close-modal></div>
+      <article class="modal-card">
+        <button class="modal-close" data-close-modal aria-label="关闭">×</button>
+        <div class="modal-date" id="detailDate"></div>
+        <div class="modal-heading"><span id="detailMood"></span><h2 id="detailTitle"></h2></div>
+        <p class="modal-body" id="detailBody"></p>
+        <div class="modal-images" id="detailImages"></div>
+      </article>
+    </div>
     <script src="app.js"></script>
   </body>
 </html>
